@@ -1,0 +1,15 @@
+--- common/lpf.c		2017-08-25 01:43:10.000000000 +0000
++++ common/lpf.c.patched	2020-04-13 17:55:32.360620000 +0000
+@@ -91,6 +91,12 @@
+ 	val = 1;
+ 	setsockopt(sock, SOL_PACKET, PACKET_AUXDATA, &val, sizeof(val));
+ 
++        /* ZOC: Set SO_PRIORITY (skb->priority in Linux kernel) to 6.
++            vlan code will then map this priority to 802.1p priority according
++            to egress configuration for the VLAN */
++        val = 6;
++        setsockopt(sock, SOL_SOCKET, SO_PRIORITY, &val, sizeof (val));
++
+ 	memcpy(&tmp, info->ifp, sizeof(tmp));
+ 	if (ioctl(sock, SIOCGIFINDEX, &tmp) < 0) {
+ 		log_fatal("Error getting interface index for \"%s\": %m",
